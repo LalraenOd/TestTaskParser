@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using System.Net;
 using System.IO;
+using System.Threading;
 
 namespace TestTaskConsoleApp
 {
@@ -15,18 +16,24 @@ namespace TestTaskConsoleApp
     {
         static void Main(string[] args)
         {
-            //Создание ссылки
-            string partNumberToParser = "600323120";
-            PartParser(partNumberToParser);
+            PartNumberGet();
             Console.Read();
         }
 
-        public static void PartParser(string partNumber)
+        public static void PartNumberGet()
         {
-            string[] result = new string[5];
+            string[] PartCodes = File.ReadAllLines("PartCodes.txt");
+        }
+
+        public void PartParser(string[] partNumbers)
+        {
             //Генерация ссылки
-            string mainLinkToParse = "https://otto-zimmermann.com.ua/autoparts/product/ZIMMERMANN/";
-            string siteToParse = mainLinkToParse + partNumber + @"/";
+            string siteToParse = "https://otto-zimmermann.com.ua/autoparts/product/ZIMMERMANN/";
+
+            foreach (var partnumber in partNumbers)
+            {
+                siteToParse += partnumber + @"/";
+            }
 
             //скачивание HTML
             Console.WriteLine("Getting HTML from:\n{0}", siteToParse);
@@ -41,18 +48,20 @@ namespace TestTaskConsoleApp
 
             string[] patterns = new string[]
             {
-                "<td class=ProdBra>(?<result>.+)</td>",
-                "<td class=ProdArt>(?<result>.+)",
-                "<td class=ProdName>(?<result>.+)</td>",
-                "^<div class=partsDescript>.*$</div></div>"
-                //"<span class=criteria>.+</span><br>",
-                //"<td><a href = \"(?<result>.+)\" > 7H0 615 301 E</a></td>",
-                //"<td class=\"tarig\">(?<result>.+)</td>",
-                //"<a href=\"(?<result>.+)\">7H0 615 301 E</a>",
-                //"<span class=\"artkind_original\">(?<result>.+)</span>"
+                "<td class=ProdBra>(?<result>.+)</td>"
+                ,"<td class=ProdArt>(?<result>.+)"
+                ,"<td class=ProdName>(?<result>.+)</td>"
+                //,"^<div class=partsDescript>.*$</div></div>"
+                //,"<td><a href = \"(?<result>.+)\" > 7H0 615 301 E</a></td>"
+                //,"<td class=\"tarig\">(?<result>.+)</td>"
+                //,"<a href=\"(?<result>.+)\">7H0 615 301 E</a>"
+                //,"<span class=\"artkind_original\">(?<result>.+)</span>"
+                //,"<span class=criteria>.+</span><br>"
             };
 
+            string[] result = new string[patterns.Length + 1];
             result[0] = siteToParse;
+
             for (int patternNumber = 0; patternNumber < patterns.Length; patternNumber++)
             {
                 Regex regex = new Regex(patterns[patternNumber]);
@@ -72,12 +81,17 @@ namespace TestTaskConsoleApp
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("No matches on pattern " + patterns[patternNumber].ToString());
                     Console.Read();
-                    Environment.Exit(0);
                 }
             }
             Logger(siteToParse);
+
             foreach (var str in result)
-                Console.WriteLine("\nResult:\n" + str.ToString());
+            {
+                if(str != null)
+                    Console.WriteLine("\nResult:\n" + str.ToString());
+                else
+                    Console.WriteLine("\nResult:\nNULL");
+            }
         }
 
         public static void Logger(string parsedLink, bool parseSuccessed = true)
