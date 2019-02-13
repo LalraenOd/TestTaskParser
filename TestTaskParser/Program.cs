@@ -88,9 +88,7 @@ namespace TestTaskConsoleApp
                         parseSuccess = false;
                     }
                 }
-
                 Logger(partNumber, parseSuccess);
-
                 Console.WriteLine("Result:");
                 foreach (var str in result)
                 {
@@ -99,9 +97,7 @@ namespace TestTaskConsoleApp
                     else
                         Console.WriteLine("Not found");
                 }
-            }
-
-            
+            }            
         }
 
         public static void Logger(string parsedNumber, bool parseSuccess)
@@ -113,13 +109,3 @@ namespace TestTaskConsoleApp
         }
     }
 }
-
-/*
-string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-
-using (SqlConnection connection = new SqlConnection(connectionString))
-{
-    SqlCommand command = new SqlCommand("", connection);
-}
-*/
-
