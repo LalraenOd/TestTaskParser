@@ -33,11 +33,11 @@ namespace TestTaskConsoleApp
 
         public static void PartParser(string[] partNumbers)
         {
-            foreach (var partnumber in partNumbers)
+            foreach (var partNumber in partNumbers)
             {            
                 //Генерация ссылки
                 string siteToParse = "https://otto-zimmermann.com.ua/autoparts/product/ZIMMERMANN/";
-                siteToParse += partnumber + @"/";
+                siteToParse += partNumber + @"/";
                 
                 //скачивание HTML
                 Console.WriteLine("\nGetting HTML from:\n{0}", siteToParse);
@@ -55,17 +55,18 @@ namespace TestTaskConsoleApp
                 "<td class=ProdBra>(?<result>.+)</td>"
                 ,"<td class=ProdArt>(?<result>.+)"
                 ,"<td class=ProdName>(?<result>.+)</td>"
-                    //,"^<div class=partsDescript>.*$</div></div>"
-                    //,"<td><a href = \"(?<result>.+)\" > 7H0 615 301 E</a></td>"
-                    //,"<td class=\"tarig\">(?<result>.+)</td>"
-                    //,"<a href=\"(?<result>.+)\">7H0 615 301 E</a>"
-                    //,"<span class=\"artkind_original\">(?<result>.+)</span>"
-                    //,"<span class=criteria>.+</span><br>"
+                ,"^<div class=partsDescript>.*$</div></div>"
+                ,"<td><a href = \"(?<result>.+)\" > 7H0 615 301 E</a></td>"
+                ,"<td class=\"tarig\">(?<result>.+)</td>"
+                ,"<a href=\"(?<result>.+)\">7H0 615 301 E</a>"
+                ,"<span class=\"artkind_original\">(?<result>.+)</span>"
+                ,"<span class=criteria>.+</span><br>"
                 };
 
                 string[] result = new string[patterns.Length + 1];
                 result[0] = siteToParse;
 
+                bool parseSuccess = true;
                 for (int patternNumber = 0; patternNumber < patterns.Length; patternNumber++)
                 {
                     Regex regex = new Regex(patterns[patternNumber]);
@@ -83,11 +84,12 @@ namespace TestTaskConsoleApp
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("No matches on pattern " + patterns[patternNumber].ToString());
+                        //Console.WriteLine("No matches on pattern " + patterns[patternNumber].ToString());
+                        parseSuccess = false;
                     }
                 }
-                Logger(siteToParse);
 
+                Logger(partNumber, parseSuccess);
 
                 Console.WriteLine("Result:");
                 foreach (var str in result)
@@ -102,9 +104,12 @@ namespace TestTaskConsoleApp
             
         }
 
-        public static void Logger(string parsedLink, bool parseSuccessed = true)
+        public static void Logger(string parsedNumber, bool parseSuccess)
         {
-            File.AppendAllText("parser.log", DateTime.Now.ToString() + "\t" + parsedLink + "\n");
+            if(parseSuccess)
+                File.AppendAllText("parser.log", DateTime.Now.ToString() + "\t" + "SUCCESS" + "\t" + parsedNumber + "\n");
+            else
+                File.AppendAllText("parser.log", DateTime.Now.ToString() + "\t" + "UNSUCCESS" + "\t" + parsedNumber + "\n");
         }
     }
 }
