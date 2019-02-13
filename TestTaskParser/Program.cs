@@ -22,7 +22,7 @@ namespace TestTaskConsoleApp
             Console.WriteLine("Reading File");
             string[] PartCodes = File.ReadAllLines("PartCodes.txt");
 
-            //Запуск парсеров в 4 потоках
+            //Запуск парсера в 4 потоках
             Thread[] parsers = new Thread[4];
             for (int i = 0; i < parsers.Length; i++)
             {
