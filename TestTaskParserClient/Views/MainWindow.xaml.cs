@@ -23,6 +23,8 @@ namespace TestTaskProCarsClient
         public MainWindow()
         {
             InitializeComponent();
+
+            DataContext = new ViewModels.MainViewModel();
         }
     }
 }
