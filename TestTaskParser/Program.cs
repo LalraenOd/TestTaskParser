@@ -13,14 +13,10 @@ namespace TestTaskConsoleApp
     {
         static void Main(string[] args)
         {
-            //string[] partsToParseManual = new string[] { "109901140", "230235220", "230701701" };
-            //PartParser(partsToParseManual);
             var partsNumber = PartNumberGet();
             PartParser(partsNumber);
 
-
-            string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-
+            string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;  
 
             Console.Read();
         }
@@ -63,24 +59,27 @@ namespace TestTaskConsoleApp
         }
 
         public static bool PartNeedsParse(string partToCheck)
-            //Check if part was already parsed - TODO
+            //Check if part was already parsed - DONE
         {
             if (!File.Exists("parser.log"))
                 return true;
 
-            string[] ParserLog = File.ReadAllLines("parser.log");
+            string[] parserLog = File.ReadAllLines("parser.log");
             bool partNeedsParse = true;
-            foreach (var part in ParserLog)
+
+            foreach (string part in parserLog)
             {
                 if (part.Contains(partToCheck))
                 {
-                    if (part.EndsWith("ERROR"))
-                        return partNeedsParse = true;
+                    if (part.Contains("ERROR"))
+                    {
+                        break;
+                    }
                     else
-                        return partNeedsParse = false;
+                        partNeedsParse = false;
                 }
                 else
-                    return partNeedsParse = true;
+                    continue;
             }
             return partNeedsParse;
         }
@@ -165,6 +164,8 @@ namespace TestTaskConsoleApp
                             Console.WriteLine("Not found");
                     }
                 }
+                else
+                    continue;
             }            
         }
 
