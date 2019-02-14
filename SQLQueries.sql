@@ -1,18 +1,19 @@
 USE TestCaseDb
 GO
 
-IF OBJECT_ID('Parts') IS NOT NULL
-	DROP TABLE Parts
-GO
-
 IF OBJECT_ID('LinkParts') IS NOT NULL
 	DROP TABLE LinkParts
 GO	
 
 CREATE TABLE LinkParts(
 Id int IDENTITY PRIMARY KEY NOT NULL,
-PartNumber varchar(20)
+PartNumber varchar(20),
+PartBrandName varchar(20)
 );
+GO
+
+IF OBJECT_ID('Parts') IS NOT NULL
+	DROP TABLE Parts
 GO
 
 CREATE TABLE Parts(
