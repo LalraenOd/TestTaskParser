@@ -3,30 +3,14 @@ using System.Runtime.CompilerServices;
 
 namespace TestTaskProCarsClient.Models
 {
-    class PartsDB : INotifyPropertyChanged
+    public class PartsDB : INotifyPropertyChanged
     {
         private int partId;
 
         public int PartId
         {
             get { return PartId; }
-            set { PartId = value; }
-        }
-
-        private string url;
-
-        public string Url
-        {
-            get { return url; }
-            set { url = value; }
-        }
-
-        private string atrNumber;
-
-        public string ArtNumber
-        {
-            get { return atrNumber; }
-            set { atrNumber = value; }
+            set { PartId = value; OnPropertyChanged("PartId"); }
         }
 
         private string brandName;
@@ -34,7 +18,7 @@ namespace TestTaskProCarsClient.Models
         public string BrandName
         {
             get { return brandName; }
-            set { brandName = value; }
+            set { brandName = value; OnPropertyChanged("BrandName"); }
         }
 
         private string partName;
@@ -42,15 +26,7 @@ namespace TestTaskProCarsClient.Models
         public string PartName
         {
             get { return partName; }
-            set { partName = value; }
-        }
-
-        private string specs;
-
-        public string Specs
-        {
-            get { return specs; }
-            set { specs = value; }
+            set { partName = value; OnPropertyChanged("PartName"); }
         }
 
         private int[] linkedParts;
@@ -58,28 +34,40 @@ namespace TestTaskProCarsClient.Models
         public int[] LinkedParts
         {
             get { return linkedParts; }
-            set { linkedParts = value; }
+            set { linkedParts = value; OnPropertyChanged("LinkedParts"); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName]string prop = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+        }
     }
 
     public class LinkedPartsDb : INotifyPropertyChanged
     {
-        private int id;
+        private int linkedPartId;
 
-        public int Id
+        public int LinkedPartId
         {
-            get { return id; }
-            set { id = value; }
+            get { return linkedPartId; }
+            set { linkedPartId = value; OnPropertyChanged("Id"); }
         }
 
-        private string linkedParts;
+        private string partName;
 
-        public string LinkedParts
+        public string PartName
         {
-            get { return  linkedParts; }
-            set {  linkedParts = value; }
+            get { return partName; }
+            set { partName = value; OnPropertyChanged("PartName"); }
+        }
+
+        private string partNumber;
+
+        public string PartNumber
+        {
+            get { return partNumber; }
+            set { partNumber = value; OnPropertyChanged("partNumber"); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
