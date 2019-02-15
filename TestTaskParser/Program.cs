@@ -7,7 +7,6 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using TestTaskProCars;
 
 namespace TestTaskParser
 {
@@ -25,7 +24,7 @@ namespace TestTaskParser
         }
 
         public static string[] PartNumberGet()
-            //PartNumberToArray - READY
+        //PartNumberToArray - DONE
         {
             string[] PartsCodes;
             Console.WriteLine("Reading File with parts to parse...");
@@ -61,7 +60,7 @@ namespace TestTaskParser
         }
 
         public static bool PartNeedsParse(string partToCheck)
-            //Check if part was already parsed - DONE
+        //Check if part was already parsed - DONE
         {
             if (!File.Exists("parser.log"))
                 return true;
@@ -87,7 +86,7 @@ namespace TestTaskParser
         }
 
         public static void ParserStart(string[] PartsCodes)
-            //Start parsing in 4 threads - TODO
+        //Start parsing in 4 threads - TODO
         {
             Thread[] parsers = new Thread[4];
             for (int i = 0; i < parsers.Length; i++)
@@ -100,7 +99,7 @@ namespace TestTaskParser
         public static void PartParser(string[] partNumbers)
         //Parser
         {
-            List<Part> partsResult = new List<Part>();
+            //List<Part> partsResult = new List<Part>();
             Dictionary<string, string> patterns = new Dictionary<string, string>
             {
                 { "patternBrand", "<td class=ProdBra>(?<result>.+)</td>" },
@@ -176,14 +175,17 @@ namespace TestTaskParser
                 }
                 else
                     continue;
-                if (parseSuccess) { Console.WriteLine(parsedPart.ToString()); }
+                if (parseSuccess)
+                {
+                    Console.WriteLine(parsedPart.ToString());
+                }
                 else { Console.WriteLine("ERROR"); }
                 Logger(partNumber, parseSuccess);
             }
         }
 
-        public static void PartToDbWriter(List<string> part)
-            //writing to DB
+        public static void PartToDbWriter(Part part)
+        //writing to DB
         {
 
         }
