@@ -1,19 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Configuration;
-using System.Collections.Generic;
-using System.Linq;
+using TestTaskProCars;
 
-namespace TestTaskConsoleApp
+namespace TestTaskParser
 {
     class Program
     {
         static void Main(string[] args)
         {
+            var manualParts = new string[] { "100124652", "100331120" };
             var partsNumber = PartNumberGet();
             PartParser(partsNumber);
 
@@ -85,8 +87,8 @@ namespace TestTaskConsoleApp
         }
 
         public static void ParserStart(string[] PartsCodes)
+            //Start parsing in 4 threads - TODO
         {
-            //Запуск парсера в 4 потоках
             Thread[] parsers = new Thread[4];
             for (int i = 0; i < parsers.Length; i++)
             {
@@ -96,14 +98,27 @@ namespace TestTaskConsoleApp
         }
 
         public static void PartParser(string[] partNumbers)
+        //Parser
         {
-            foreach (var partNumber in partNumbers)
+            List<Part> partsResult = new List<Part>();
+            Dictionary<string, string> patterns = new Dictionary<string, string>
             {
+                { "patternBrand", "<td class=ProdBra>(?<result>.+)</td>" },
+                { "patternArt", "<td class=ProdArt>(?<result>.+)"},
+                { "patternName", "<td></td><td class=ProdName>(?<result>.+)</td>"},
+                { "patternCriteria", "<span class=criteria>(?<result>.+)</span><br>"}
+            };
+            bool parseSuccess = true;
+
+            foreach (string partNumber in partNumbers)
+            {
+                Part parsedPart = new Part();
                 if (PartNeedsParse(partNumber))
                 {
                     //Link generation
-                    string siteToParse = "https://otto-zimmermann.com.ua/autoparts/product/ZIMMERMANN/";
+                    string siteToParse = "http://otto-zimmermann.com.ua/autoparts/product/ZIMMERMANN/";
                     siteToParse += partNumber + @"/";
+                    parsedPart.Url = siteToParse;
 
                     //Download HTML
                     Console.WriteLine("\nGetting HTML from:\n{0}", siteToParse);
@@ -113,83 +128,62 @@ namespace TestTaskConsoleApp
                     };
                     string downloadedHTML = client.DownloadString(siteToParse);
 
+                    Regex regexB = new Regex(patterns["patternBrand"]);
+                    MatchCollection matchesB = regexB.Matches(downloadedHTML);
+                    if (matchesB.Count == 0)
+                    {
+                        Console.WriteLine("Page Not Found");
+                        parseSuccess = false;
+                        Logger(partNumber, parseSuccess);
+                        continue;
+                    }
+
                     //Parsing
                     Console.WriteLine("Trying to parse...");
-
-                    string[] patterns = new string[]
+                    foreach(var pattern in patterns)
                     {
-                        "<td class=ProdBra>(?<result>.+)</td>"
-                        ,"<td class=ProdArt>(?<result>.+)"
-                        ,"<td class=ProdName>(?<result>.+)</td>"
-                    //    ,"^<div class=partsDescript>(?<result>.+)</div></div>"
-                    //    ,"<td><a href = \"(?<result>.+)\" > 7H0 615 301 E</a></td>"
-                    //    ,"<td class=\"tarig\">(?<result>.+)</td>"
-                    //    ,"<a href=\"(?<result>.+)\">7H0 615 301 E</a>"
-                    //    ,"<span class=\"artkind_original\">(?<result>.+)</span>"
-                        ,"<span class=criteria>(?<result>.+)</span><br>"
-                    };
-
-                    List<string> result = new List<string>();
-                    result.Add(siteToParse);
-                    
-                    bool parseSuccess = true;
-                    for (int patternNumber = 0; patternNumber < patterns.Length; patternNumber++)
-                    {
-                        Regex regex = new Regex(patterns[patternNumber]);
+                        Regex regex = new Regex(pattern.Value.ToString());
                         MatchCollection matches = regex.Matches(downloadedHTML);
-                        if (patternNumber == 0 && matches.Count == 0)
-                            //Check if page exists
-                        {
-                            Console.WriteLine("Page not found");
-                            parseSuccess = false;
-                            break;
-                        }
-
                         if (matches.Count > 0)
                         {
-                            foreach (Match match in matches)
+                            switch (pattern.Key)
                             {
-                                //if (patternNumber != 3)
-                                //    result[patternNumber + 1] = match.Groups["result"].Value.ToString();
-                                //else
-                                //    result[patternNumber + 1] += match;
-                                result.Add(match.Groups["result"].Value.ToString());
+                                case "patternBrand":
+                                    parsedPart.PartBrand = matches[0].Groups["result"].Value.ToString();
+                                    break;
+                                case "patternArt":
+                                    parsedPart.ArtNumber = matches[0].Groups["result"].Value.ToString();
+                                    break;
+                                case "patternName":
+                                    parsedPart.PartName = matches[0].Groups["result"].Value.ToString();
+                                    break;
+                                case "patternCriteria":
+                                    foreach (Match match in matches)
+                                        parsedPart.Specs.Add(match.Groups["result"].Value.ToString());
+                                    parsedPart.Specs = parsedPart.Specs.Distinct().ToList();
+                                    break;
+                                default:
+                                    break;
                             }
+                            parseSuccess = true;
                         }
                         else
                         {
-                            //Console.ForegroundColor = ConsoleColor.Red;
-                            Console.WriteLine("No matches on pattern " + patterns[patternNumber].ToString());
                             parseSuccess = false;
+                            Console.WriteLine("Error on pattern: " + pattern.Key.ToString() +"\t" + pattern.Value.ToString());
                         }
                     }
-
-                    Logger(partNumber, parseSuccess);
-                    
-                    //remove duplicates 
-                    result = result.Distinct().ToList();
-
-#if DEBUG
-                    if (parseSuccess)
-                    {
-                        Console.WriteLine("Result:");
-                        foreach (var str in result)
-                        {
-                            if (str != null)
-                                Console.WriteLine(str.ToString());
-                            else
-                                Console.WriteLine("Not found");
-                        }
-                    }
-#endif
                 }
                 else
                     continue;
-                Console.Read();
-            }            
+                if (parseSuccess) { Console.WriteLine(parsedPart.ToString()); }
+                else { Console.WriteLine("ERROR"); }
+                Logger(partNumber, parseSuccess);
+            }
         }
 
-        public static void PartToDbWriter()
+        public static void PartToDbWriter(List<string> part)
+            //writing to DB
         {
 
         }

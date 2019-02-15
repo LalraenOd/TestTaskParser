@@ -19,8 +19,8 @@ GO
 CREATE TABLE Parts(
 Id int IDENTITY PRIMARY KEY NOT NULL,
 URL varchar(70),
-ArtNumber varchar(20),
 BrandName nvarchar(20),
+ArtNumber varchar(20),
 PartName nvarchar(30),
 Specs xml,
 LinkedParts int FOREIGN KEY REFERENCES LinkParts(Id)
