@@ -17,7 +17,7 @@ namespace TestTaskParser
                    "\nPart Brand: " + PartBrand +
                    "\nArtNumber: " + PartArtNumber +
                    "\nPartName: " + PartName +
-                   "\nSpecs:\n " +  string.Join("\n", PartSpecs);//+
+                   "\nSpecs:\n " +  string.Join("\n", PartSpecs.ToArray());//+
                    //"LinkedParts" + LinkedParts.ToString();
         }
     }

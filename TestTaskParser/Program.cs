@@ -225,7 +225,7 @@ namespace TestTaskParser
             {
                 string sqlExpression = String.Format
                     ("INSERT INTO dbo.Parts (URL, ArtNumber, BrandName, PartName, Specs) VALUES ( '{0}', '{1}', '{2}', '{3}', '{4}' )",
-                    part.PartUrl, part.PartArtNumber, part.PartBrand, part.PartName, part.PartSpecs);
+                    part.PartUrl, part.PartArtNumber, part.PartBrand, part.PartName, string.Join("\n", part.PartSpecs.ToArray()));
                 SqlCommand sqlCommand = new SqlCommand(sqlExpression, sqlConnection);
                 sqlCommand.ExecuteNonQuery();
             }
