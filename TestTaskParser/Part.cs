@@ -4,20 +4,20 @@ namespace TestTaskParser
 {
     class Part
     {
-        public string Url { get; set; }
+        public string PartUrl { get; set; }
         public string PartBrand { get; set; }
-        public string ArtNumber { get; set; }
+        public string PartArtNumber { get; set; }
         public string PartName { get; set; }
-        public List<string> Specs { get; set; } = new List<string>();
+        public List<string> PartSpecs { get; set; } = new List<string>();
         //public int[] LinkedParts { get; set; }
 
         public override string ToString()
         {
-            return "\nPart URL: " + Url +
+            return "\nPart URL: " + PartUrl +
                    "\nPart Brand: " + PartBrand +
-                   "\nArtNumber: " + ArtNumber +
+                   "\nArtNumber: " + PartArtNumber +
                    "\nPartName: " + PartName +
-                   "\nSpecs:\n " +  string.Join("\n", Specs);//+
+                   "\nSpecs:\n " +  string.Join("\n", PartSpecs);//+
                    //"LinkedParts" + LinkedParts.ToString();
         }
     }

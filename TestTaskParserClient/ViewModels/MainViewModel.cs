@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace TestTaskProCarsClient.ViewModels
+namespace TestTaskParserClient.ViewModels
 {
     class MainViewModel : INotifyPropertyChanged
     {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace TestTaskProCarsClient.Models
+namespace TestTaskParserClient.Models
 {
     public class PartsDB : INotifyPropertyChanged
     {

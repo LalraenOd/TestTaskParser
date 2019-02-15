@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -12,18 +13,38 @@ namespace TestTaskParser
 {
     class Program
     {
+        private static SqlConnection sqlConnection;
+
         static void Main(string[] args)
         {
-            var manualParts = new string[] { "100124652", "100331120" };
-            var partsNumber = PartNumberGet();
+            string[] partsNumber = PartNumberGet();
+            //string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=TestCaseDb;Integrated Security=True";
+            sqlConnection = new SqlConnection(connectionString);
+
+            try
+            {
+                sqlConnection.Open();
+            }
+            catch (SqlException)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("SQL CONNECTION ERROR");
+                Console.ResetColor();
+            }
+            if (sqlConnection.State.ToString() == "Open")
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("SQL Connected");
+                Console.ResetColor();
+            }
+
             PartParser(partsNumber);
-
-            string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;  
-
+            sqlConnection.Close();
             Console.Read();
         }
 
-        public static string[] PartNumberGet()
+        private static string[] PartNumberGet()
         //PartNumberToArray - DONE
         {
             string[] PartsCodes;
@@ -59,7 +80,7 @@ namespace TestTaskParser
             return PartsCodes;
         }
 
-        public static bool PartNeedsParse(string partToCheck)
+        private static bool PartNeedsParse(string partToCheck)
         //Check if part was already parsed - DONE
         {
             if (!File.Exists("parser.log"))
@@ -85,7 +106,7 @@ namespace TestTaskParser
             return partNeedsParse;
         }
 
-        public static void ParserStart(string[] PartsCodes)
+        private static void ParserStart(string[] PartsCodes)
         //Start parsing in 4 threads - TODO
         {
             Thread[] parsers = new Thread[4];
@@ -96,8 +117,8 @@ namespace TestTaskParser
             }
         }
 
-        public static void PartParser(string[] partNumbers)
-        //Parser
+        private static void PartParser(string[] partNumbers)
+        //Parser - 80% DONE; TODO: XML AND LINKED PARTS
         {
             //List<Part> partsResult = new List<Part>();
             Dictionary<string, string> patterns = new Dictionary<string, string>
@@ -117,7 +138,7 @@ namespace TestTaskParser
                     //Link generation
                     string siteToParse = "http://otto-zimmermann.com.ua/autoparts/product/ZIMMERMANN/";
                     siteToParse += partNumber + @"/";
-                    parsedPart.Url = siteToParse;
+                    parsedPart.PartUrl = siteToParse;
 
                     //Download HTML
                     Console.WriteLine("\nGetting HTML from:\n{0}", siteToParse);
@@ -131,7 +152,9 @@ namespace TestTaskParser
                     MatchCollection matchesB = regexB.Matches(downloadedHTML);
                     if (matchesB.Count == 0)
                     {
-                        Console.WriteLine("Page Not Found");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("PAGE NOT FOUND");
+                        Console.ResetColor();
                         parseSuccess = false;
                         Logger(partNumber, parseSuccess);
                         continue;
@@ -151,15 +174,15 @@ namespace TestTaskParser
                                     parsedPart.PartBrand = matches[0].Groups["result"].Value.ToString();
                                     break;
                                 case "patternArt":
-                                    parsedPart.ArtNumber = matches[0].Groups["result"].Value.ToString();
+                                    parsedPart.PartArtNumber = matches[0].Groups["result"].Value.ToString();
                                     break;
                                 case "patternName":
                                     parsedPart.PartName = matches[0].Groups["result"].Value.ToString();
                                     break;
                                 case "patternCriteria":
                                     foreach (Match match in matches)
-                                        parsedPart.Specs.Add(match.Groups["result"].Value.ToString());
-                                    parsedPart.Specs = parsedPart.Specs.Distinct().ToList();
+                                        parsedPart.PartSpecs.Add(match.Groups["result"].Value.ToString());
+                                    parsedPart.PartSpecs = parsedPart.PartSpecs.Distinct().ToList();
                                     break;
                                 default:
                                     break;
@@ -169,7 +192,9 @@ namespace TestTaskParser
                         else
                         {
                             parseSuccess = false;
-                            Console.WriteLine("Error on pattern: " + pattern.Key.ToString() +"\t" + pattern.Value.ToString());
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("ERROR ON PATTERN: " + pattern.Key.ToString() +"\t" + pattern.Value.ToString());
+                            Console.ResetColor();
                         }
                     }
                 }
@@ -177,20 +202,54 @@ namespace TestTaskParser
                     continue;
                 if (parseSuccess)
                 {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("PARSING SUCCESSFUL");
+                    Console.ResetColor();
                     Console.WriteLine(parsedPart.ToString());
+                    PartToDbWriter(parsedPart);
                 }
-                else { Console.WriteLine("ERROR"); }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("PARSING ERROR");
+                    Console.ResetColor();
+                }
                 Logger(partNumber, parseSuccess);
             }
         }
 
-        public static void PartToDbWriter(Part part)
-        //writing to DB
+        private static void PartToDbWriter(Part part)
+        //WRITING PART TO DB - TODO
         {
+            try
+            {
+                string sqlExpression = String.Format
+                    ("INSERT INTO dbo.Parts (URL, ArtNumber, BrandName, PartName, Specs) VALUES ( '{0}', '{1}', '{2}', '{3}', '{4}' )",
+                    part.PartUrl, part.PartArtNumber, part.PartBrand, part.PartName, part.PartSpecs);
+                SqlCommand sqlCommand = new SqlCommand(sqlExpression, sqlConnection);
+                sqlCommand.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("SQL INSERTING ERROR");
+#if DEBUG
+                Console.WriteLine(ex.ToString());
+                Console.Read();
+#endif
+                Console.ResetColor();
+            }
+            finally
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("SQL QUERY  SUCCESS");
+                Console.ResetColor();
+            }
 
         }
 
-        public static void Logger(string parsedNumber, bool parseSuccess)
+        private static void Logger(string parsedNumber, bool parseSuccess)
+        //LOG TO FILE - DONE
         {
             if(parseSuccess)
                 File.AppendAllText("parser.log", parsedNumber + " SUCCESS" + "\n");
