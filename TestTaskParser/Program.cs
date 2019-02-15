@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Configuration;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TestTaskConsoleApp
 {
@@ -30,11 +31,10 @@ namespace TestTaskConsoleApp
             {
                 PartsCodes = File.ReadAllLines("CodesToParse.txt");                
             }
-            catch (Exception e)
+            catch(FileNotFoundException)
             {
                 PartsCodes = null;
-                Console.WriteLine("Error reading CodesToParse.txt");
-                Console.WriteLine(e.ToString());
+                Console.WriteLine("File not found!!!\nPlease add file and restart the programm");
                 Console.ReadKey();
                 Environment.Exit(0);
             }
@@ -101,11 +101,11 @@ namespace TestTaskConsoleApp
             {
                 if (PartNeedsParse(partNumber))
                 {
-                    //Генерация ссылки
+                    //Link generation
                     string siteToParse = "https://otto-zimmermann.com.ua/autoparts/product/ZIMMERMANN/";
                     siteToParse += partNumber + @"/";
 
-                    //скачивание HTML
+                    //Download HTML
                     Console.WriteLine("\nGetting HTML from:\n{0}", siteToParse);
                     WebClient client = new WebClient
                     {
@@ -113,7 +113,7 @@ namespace TestTaskConsoleApp
                     };
                     string downloadedHTML = client.DownloadString(siteToParse);
 
-                    //Парсинг
+                    //Parsing
                     Console.WriteLine("Trying to parse...");
 
                     string[] patterns = new string[]
@@ -121,51 +121,71 @@ namespace TestTaskConsoleApp
                         "<td class=ProdBra>(?<result>.+)</td>"
                         ,"<td class=ProdArt>(?<result>.+)"
                         ,"<td class=ProdName>(?<result>.+)</td>"
-                        ,"^<div class=partsDescript>.*$</div></div>"
-                        ,"<td><a href = \"(?<result>.+)\" > 7H0 615 301 E</a></td>"
-                        ,"<td class=\"tarig\">(?<result>.+)</td>"
-                        ,"<a href=\"(?<result>.+)\">7H0 615 301 E</a>"
-                        ,"<span class=\"artkind_original\">(?<result>.+)</span>"
-                        ,"<span class=criteria>.+</span><br>"
+                    //    ,"^<div class=partsDescript>(?<result>.+)</div></div>"
+                    //    ,"<td><a href = \"(?<result>.+)\" > 7H0 615 301 E</a></td>"
+                    //    ,"<td class=\"tarig\">(?<result>.+)</td>"
+                    //    ,"<a href=\"(?<result>.+)\">7H0 615 301 E</a>"
+                    //    ,"<span class=\"artkind_original\">(?<result>.+)</span>"
+                        ,"<span class=criteria>(?<result>.+)</span><br>"
                     };
 
-                    string[] result = new string[patterns.Length + 1];
-                    result[0] = siteToParse;
-
+                    List<string> result = new List<string>();
+                    result.Add(siteToParse);
+                    
                     bool parseSuccess = true;
                     for (int patternNumber = 0; patternNumber < patterns.Length; patternNumber++)
                     {
                         Regex regex = new Regex(patterns[patternNumber]);
                         MatchCollection matches = regex.Matches(downloadedHTML);
+                        if (patternNumber == 0 && matches.Count == 0)
+                            //Check if page exists
+                        {
+                            Console.WriteLine("Page not found");
+                            parseSuccess = false;
+                            break;
+                        }
+
                         if (matches.Count > 0)
                         {
                             foreach (Match match in matches)
                             {
-                                if (patternNumber != 3)
-                                    result[patternNumber + 1] = match.Groups["result"].Value.ToString();
-                                else
-                                    result[patternNumber + 1] += match;
+                                //if (patternNumber != 3)
+                                //    result[patternNumber + 1] = match.Groups["result"].Value.ToString();
+                                //else
+                                //    result[patternNumber + 1] += match;
+                                result.Add(match.Groups["result"].Value.ToString());
                             }
                         }
                         else
                         {
                             //Console.ForegroundColor = ConsoleColor.Red;
-                            //Console.WriteLine("No matches on pattern " + patterns[patternNumber].ToString());
+                            Console.WriteLine("No matches on pattern " + patterns[patternNumber].ToString());
                             parseSuccess = false;
                         }
                     }
+
                     Logger(partNumber, parseSuccess);
-                    Console.WriteLine("Result:");
-                    foreach (var str in result)
+                    
+                    //remove duplicates 
+                    result = result.Distinct().ToList();
+
+#if DEBUG
+                    if (parseSuccess)
                     {
-                        if (str != null)
-                            Console.WriteLine(str.ToString());
-                        else
-                            Console.WriteLine("Not found");
+                        Console.WriteLine("Result:");
+                        foreach (var str in result)
+                        {
+                            if (str != null)
+                                Console.WriteLine(str.ToString());
+                            else
+                                Console.WriteLine("Not found");
+                        }
                     }
+#endif
                 }
                 else
                     continue;
+                Console.Read();
             }            
         }
 
