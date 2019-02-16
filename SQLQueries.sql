@@ -38,6 +38,7 @@ SELECT TOP (1000) [Id]
       ,[Specs]
       ,[LinkedParts]
   FROM [TestCaseDb].[dbo].[Parts]
+  GO
 
 
 --INSERT INTO dbo.Parts(URL, ArtNumber, BrandName,PartName, Specs) VALUES ()

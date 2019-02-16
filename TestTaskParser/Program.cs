@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -18,6 +17,7 @@ namespace TestTaskParser
         static void Main(string[] args)
         {
             string[] partsNumber = PartNumberGet();
+            string[] manualParts = new string[] { "100124620", "100124652", "100331120" };
             //string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
             string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=TestCaseDb;Integrated Security=True";
             sqlConnection = new SqlConnection(connectionString);
@@ -39,7 +39,7 @@ namespace TestTaskParser
                 Console.ResetColor();
             }
 
-            PartParser(partsNumber);
+            PartParser(manualParts);
             sqlConnection.Close();
             Console.Read();
         }
@@ -123,10 +123,11 @@ namespace TestTaskParser
             //List<Part> partsResult = new List<Part>();
             Dictionary<string, string> patterns = new Dictionary<string, string>
             {
-                { "patternBrand", "<td class=ProdBra>(?<result>.+)</td>" },
-                { "patternArt", "<td class=ProdArt>(?<result>.+)"},
-                { "patternName", "<td></td><td class=ProdName>(?<result>.+)</td>"},
-                { "patternCriteria", "<span class=criteria>(?<result>.+)</span><br>"}
+                { "patternBrand", "<td class=ProdBra>(?<result>.+)</td>" }
+                ,{ "patternArt", "<td class=ProdArt>(?<result>.+)"}
+                ,{ "patternName", "<td></td><td class=ProdName>(?<result>.+)</td>"}
+                ,{ "patternCriteria", "<span class=criteria>(?<result>.+)</span><br>"}
+                ,{ "patternCriteriaNEW", "<div class=partsDescript>(?<result>.+)<div id=TabsContent></div>" }
             };
             bool parseSuccess = true;
 
@@ -159,6 +160,7 @@ namespace TestTaskParser
                         Logger(partNumber, parseSuccess);
                         continue;
                     }
+                    File.AppendAllText("html.txt", downloadedHTML);
 
                     //Parsing
                     Console.WriteLine("Trying to parse...");
@@ -183,6 +185,13 @@ namespace TestTaskParser
                                     foreach (Match match in matches)
                                         parsedPart.PartSpecs.Add(match.Groups["result"].Value.ToString());
                                     parsedPart.PartSpecs = parsedPart.PartSpecs.Distinct().ToList();
+                                    break;
+                                case "patternCriteriaNEW":
+                                    foreach (Match match in matches)
+                                    {
+                                        Console.WriteLine(match.Groups["result"].Value.ToString()); 
+                                    }
+                                    Console.Read();
                                     break;
                                 default:
                                     break;
