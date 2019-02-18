@@ -17,7 +17,7 @@ namespace TestTaskParser
         static void Main(string[] args)
         {
             string[] partsNumber = PartNumberGet();
-            //string[] manualParts = new string[] { "100124620", "100124652", "100331120" };
+            string[] manualParts = new string[] { "100124620", "100124652", "100331120" };
             string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=TestCaseDb;Integrated Security=True";
             sqlConnection = new SqlConnection(connectionString);
 
@@ -126,7 +126,7 @@ namespace TestTaskParser
                 ,{ "patternArt", "<td class=ProdArt>(?<result>.+)"}
                 ,{ "patternName", "<td></td><td class=ProdName>(?<result>.+)</td>"}
                 ,{ "patternCriteria", "<span class=criteria>(?<result>.+)</span><br>"}
-                ,{ "patternCriteriaNEW", "<div class=partsDescript>(?<result>.+)<div id=TabsContent></div>" }
+                //,{ "patternCriteriaNEW", "<div class=partsDescript>(?<result>.+)<div id=TabsContent></div>" }
             };
             bool parseSuccess = true;
 
@@ -231,21 +231,30 @@ namespace TestTaskParser
         {
             try
             {
-                string sqlExpression = String.Format
-                    ("INSERT INTO dbo.Parts (URL, ArtNumber, BrandName, PartName, Specs) VALUES ( '{0}', '{1}', '{2}', '{3}', '{4}' )",
-                    part.PartUrl, part.PartArtNumber, part.PartBrand, part.PartName, string.Join("\n", part.PartSpecs.ToArray()));
-                SqlCommand sqlCommand = new SqlCommand(sqlExpression, sqlConnection);
+                string sqlExpression = "sp_InsertPart";
+                SqlCommand sqlCommand = new SqlCommand(sqlExpression, sqlConnection)
+                {
+                    CommandType = System.Data.CommandType.StoredProcedure
+                };
+                sqlCommand.Parameters.AddRange(
+                    new SqlParameter[] 
+                    {
+                        new SqlParameter("@URL",        value: part.PartUrl),
+                        new SqlParameter("@BrandName",  value: part.PartBrand),
+                        new SqlParameter("@ArtNumber",  value: part.PartArtNumber),
+                        new SqlParameter("@PartName",   value: part.PartName),
+                        new SqlParameter("@Specs",      value: string.Join("\n", part.PartSpecs.ToArray()))
+                    });
                 sqlCommand.ExecuteNonQuery();
             }
             catch (SqlException ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("SQL INSERTING ERROR");
+                Console.ResetColor();
 #if DEBUG
                 Console.WriteLine(ex.ToString());
-                Console.Read();
 #endif
-                Console.ResetColor();
             }
             finally
             {

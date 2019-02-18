@@ -42,3 +42,20 @@ SELECT TOP (1000) [Id]
 
 
 --INSERT INTO dbo.Parts(URL, ArtNumber, BrandName,PartName, Specs) VALUES ()
+CREATE PROCEDURE [dbo].[sp_InsertPart]
+	@URL varchar(70),
+	@BrandName nvarchar(20),
+	@ArtNumber varchar(20),
+	@PartName nvarchar(30),
+	--@Specs xml,
+	@Specs nvarchar(1000)
+AS
+	INSERT INTO Parts(URL, BrandName, ArtNumber, PartName, Specs)
+	VALUES (@URL, @BrandName, @ArtNumber, @ArtNumber, @Specs)
+GO
+
+CREATE PROCEDURE [dbo].[sp_PartByNumber]
+	@ArtNumberToFind varchar(20)
+AS
+	SELECT * FROM Parts
+	WHERE ArtNumber = @ArtNumberToFind
