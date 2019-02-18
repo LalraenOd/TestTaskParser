@@ -23,8 +23,12 @@ namespace TestTaskParserClient
         public MainWindow()
         {
             InitializeComponent();
+            
+        }
 
-            DataContext = new ViewModels.MainViewModel();
+        public void GetAllDataFromDB()
+        {
+
         }
     }
 }

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TestTaskProCarsClient.Properties
+namespace TestTaskParserClient.Properties
 {
 
 

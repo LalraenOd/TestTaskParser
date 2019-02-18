@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace TestTaskParser
 {
-    class Part
+    public class Part
     {
         public string PartUrl { get; set; }
         public string PartBrand { get; set; }

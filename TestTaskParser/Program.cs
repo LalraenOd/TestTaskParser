@@ -17,8 +17,7 @@ namespace TestTaskParser
         static void Main(string[] args)
         {
             string[] partsNumber = PartNumberGet();
-            string[] manualParts = new string[] { "100124620", "100124652", "100331120" };
-            //string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            //string[] manualParts = new string[] { "100124620", "100124652", "100331120" };
             string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=TestCaseDb;Integrated Security=True";
             sqlConnection = new SqlConnection(connectionString);
 
@@ -39,7 +38,7 @@ namespace TestTaskParser
                 Console.ResetColor();
             }
 
-            PartParser(manualParts);
+            PartParser(partsNumber);
             sqlConnection.Close();
             Console.Read();
         }
