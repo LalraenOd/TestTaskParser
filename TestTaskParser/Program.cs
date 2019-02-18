@@ -257,8 +257,7 @@ namespace TestTaskParser
                 {
                     CommandType = System.Data.CommandType.StoredProcedure
                 };
-                sqlCommand.Parameters.AddRange(
-                    new SqlParameter[] 
+                sqlCommand.Parameters.AddRange(new SqlParameter[]
                     {
                         new SqlParameter("@URL",        value: part.PartUrl),
                         new SqlParameter("@BrandName",  value: part.PartBrand),
@@ -273,9 +272,6 @@ namespace TestTaskParser
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("SQL INSERTING ERROR");
                 Console.ResetColor();
-#if DEBUG
-                Console.WriteLine(ex.ToString());
-#endif
             }
             finally
             {

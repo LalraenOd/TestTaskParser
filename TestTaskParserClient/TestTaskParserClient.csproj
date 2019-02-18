@@ -94,5 +94,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TestTaskParser\TestTaskParser.csproj">
+      <Project>{2dbf6353-86a0-4596-a6f4-738cc562deb2}</Project>
+      <Name>TestTaskParser</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

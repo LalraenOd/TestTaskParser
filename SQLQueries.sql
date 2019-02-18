@@ -54,8 +54,14 @@ AS
 	VALUES (@URL, @BrandName, @ArtNumber, @ArtNumber, @Specs)
 GO
 
-CREATE PROCEDURE [dbo].[sp_PartByNumber]
+CREATE PROCEDURE [dbo].[sp_GetAllParts]
+AS
+	SELECT * FROM Parts
+GO
+
+CREATE PROCEDURE [dbo].[sp_GetPartsByNumber]
 	@ArtNumberToFind varchar(20)
 AS
 	SELECT * FROM Parts
 	WHERE ArtNumber = @ArtNumberToFind
+GO
