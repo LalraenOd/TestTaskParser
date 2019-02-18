@@ -29,18 +29,22 @@ namespace TestTaskParserClient
         public MainWindow()
         {
             InitializeComponent();
-
-            Thread.Sleep(1000);
         }
-        
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            List<Part> parts = GetAllDataFromDB();
+            ListToListView(parts);
+        }
+
         /// <summary>
         /// Changes DB connection state
         /// </summary>
-        private void DbChangeConnectionState()
+        private static void DbChangeConnectionState()
         {
             string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=TestCaseDb;Integrated Security=True";
             sqlConnection = new SqlConnection(connectionString);
-            if (sqlConnection.State.ToString() == "Close")
+            if (sqlConnection.State.ToString() == "Closed")
             {
                 try
                 {
@@ -79,11 +83,11 @@ namespace TestTaskParserClient
         /// <summary>
         /// Gets all data from DB.
         /// </summary>
-        public List<Part> GetAllDataFromDB()
+        private List<Part> GetAllDataFromDB()
         {
             DbChangeConnectionState();
             List<Part> partsList = new List<Part>();
-            string sqlExpression = "sp_PartByNumber";
+            string sqlExpression = "sp_GetAllParts";
             SqlCommand sqlCommand = new SqlCommand(sqlExpression, sqlConnection)
             {
                 CommandType = CommandType.StoredProcedure
@@ -104,6 +108,18 @@ namespace TestTaskParserClient
             }
             DbChangeConnectionState();
             return partsList;
+        }
+
+        /// <summary>
+        /// Writes all List of parts to ListView
+        /// </summary>
+        /// <param name="parts"></param>
+        private void ListToListView(List<Part> parts)
+        {
+            foreach (Part part in parts)
+            {
+                ListViewByNumber.Items.Add(part);
+            }
         }
     }
 }
