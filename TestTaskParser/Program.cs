@@ -43,6 +43,10 @@ namespace TestTaskParser
             Console.Read();
         }
 
+        /// <summary>
+        /// Gets part numbers from file
+        /// </summary>
+        /// <returns></returns>
         private static string[] PartNumberGet()
         //PartNumberToArray - DONE
         {
@@ -79,6 +83,11 @@ namespace TestTaskParser
             return PartsCodes;
         }
 
+        /// <summary>
+        /// Checks if part needs to be parsed.
+        /// </summary>
+        /// <param name="partToCheck"></param>
+        /// <returns></returns>
         private static bool PartNeedsParse(string partToCheck)
         //Check if part was already parsed - DONE
         {
@@ -105,6 +114,10 @@ namespace TestTaskParser
             return partNeedsParse;
         }
 
+        /// <summary>
+        /// Starts four different parser threads.
+        /// </summary>
+        /// <param name="PartsCodes"></param>
         private static void ParserStart(string[] PartsCodes)
         //Start parsing in 4 threads - TODO
         {
@@ -116,6 +129,10 @@ namespace TestTaskParser
             }
         }
 
+        /// <summary>
+        /// Parses array of parts and calls method to wtite it to DB.
+        /// </summary>
+        /// <param name="partNumbers"></param>
         private static void PartParser(string[] partNumbers)
         //Parser - 80% DONE; TODO: XML AND LINKED PARTS
         {
@@ -226,6 +243,10 @@ namespace TestTaskParser
             }
         }
 
+        /// <summary>
+        /// Writes part to DB.
+        /// </summary>
+        /// <param name="part"></param>
         private static void PartToDbWriter(Part part)
         //WRITING PART TO DB - TODO
         {
@@ -265,6 +286,11 @@ namespace TestTaskParser
 
         }
 
+        /// <summary>
+        /// Logs part number and parser (un)success state
+        /// </summary>
+        /// <param name="parsedNumber"></param>
+        /// <param name="parseSuccess"></param>
         private static void Logger(string parsedNumber, bool parseSuccess)
         //LOG TO FILE - DONE
         {
