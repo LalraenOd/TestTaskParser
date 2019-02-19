@@ -40,17 +40,23 @@ SELECT TOP (1000) [Id]
   GO
 
 
---INSERT INTO dbo.Parts(URL, ArtNumber, BrandName,PartName, Specs) VALUES ()
+DROP PROCEDURE [dbo].[sp_InsertPart]
+GO
+
 CREATE PROCEDURE [dbo].[sp_InsertPart]
 	@URL varchar(70),
 	@BrandName nvarchar(20),
 	@ArtNumber varchar(20),
 	@PartName nvarchar(30),
-	--@Specs xml,
 	@Specs nvarchar(1000)
 AS
 	INSERT INTO Parts(URL, BrandName, ArtNumber, PartName, Specs)
 	VALUES (@URL, @BrandName, @ArtNumber, @PartName, @Specs)
+GO
+
+
+
+DROP PROCEDURE [dbo].[sp_GetAllParts]
 GO
 
 CREATE PROCEDURE [dbo].[sp_GetAllParts]
@@ -58,9 +64,26 @@ AS
 	SELECT * FROM [TestCaseDb].[dbo].[Parts]
 GO
 
+
+
+DROP PROCEDURE [dbo].[sp_GetPartsByNumber]
+GO
+
 CREATE PROCEDURE [dbo].[sp_GetPartsByNumber]
 	@ArtNumberToFind varchar(20)
 AS
-	SELECT * FROM Parts
-	WHERE ArtNumber = @ArtNumberToFind
+	SELECT * FROM [TestCaseDb].[dbo].[Parts]
+	WHERE ArtNumber LIKE @ArtNumberToFind
+GO
+
+
+
+DROP PROCEDURE [dbo].[sp_GetPartsByName]
+GO
+
+CREATE PROCEDURE [dbo].[sp_GetPartsByName]
+	@PartNameToFind varchar(30)
+AS
+	SELECT * FROM [TestCaseDb].[dbo].[Parts]
+	WHERE PartName LIKE @PartNameToFind
 GO

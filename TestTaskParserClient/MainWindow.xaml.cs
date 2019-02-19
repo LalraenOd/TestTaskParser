@@ -20,6 +20,11 @@ namespace TestTaskParserClient
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Event on window loaded
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             List<Part> parts = GetAllDataFromDB();
@@ -45,10 +50,6 @@ namespace TestTaskParserClient
                     MessageBox.Show("SQL CONNECTION ERROR\n" + ex);
                     throw;
                 }
-                finally
-                {
-                    MessageBox.Show("SQL CONNECTED SUCCESSFULLY");
-                }
             }
             else if (connectionState == "Close")
             {
@@ -61,10 +62,6 @@ namespace TestTaskParserClient
                     MessageBox.Show("SQL CONNECTION ERROR\n" + ex);
                     throw;
                 }
-                finally
-                {
-                    MessageBox.Show("SQL DISCONNECTED SUCCESSFULLY");
-                }
             }
             else
                 MessageBox.Show("SQL connection error state:\n" + sqlConnection.State.ToString());
@@ -75,6 +72,7 @@ namespace TestTaskParserClient
         /// </summary>
         private List<Part> GetAllDataFromDB()
         {
+            ClearAllListViews();
             List<Part> partsList = new List<Part>();
             DbChangeConnectionState("Open");
             string sqlExpression = "sp_GetAllParts";
@@ -126,7 +124,11 @@ namespace TestTaskParserClient
             {
                 CommandType = CommandType.StoredProcedure
             };
-            sqlCommand.Parameters.Add(partNumber);
+            sqlCommand.Parameters.Add(new SqlParameter
+            {
+                ParameterName = "@ArtNumberToFind",
+                Value = partNumber
+            });
             SqlDataReader sqlDataReader = sqlCommand.ExecuteReader();
 
             while (sqlDataReader.Read())
@@ -158,7 +160,11 @@ namespace TestTaskParserClient
             {
                 CommandType = CommandType.StoredProcedure
             };
-            sqlCommand.Parameters.Add(partName);
+            sqlCommand.Parameters.Add(new SqlParameter
+            {
+                ParameterName = "@PartNameToFind",
+                Value = partName
+            });
             SqlDataReader sqlDataReader = sqlCommand.ExecuteReader();
 
             while (sqlDataReader.Read())
@@ -177,26 +183,74 @@ namespace TestTaskParserClient
             return partsList;
         }
 
+        /// <summary>
+        /// Clears two initialized listViews
+        /// </summary>
+        private void ClearAllListViews()
+        {
+            ListViewByName.Items.Clear();
+            ListViewByNumber.Items.Clear();
+        }
+
+        /// <summary>
+        /// Button that refreshes all the content in listViews
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonRefresh_Click(object sender, RoutedEventArgs e)
         {
+            ClearAllListViews();
             List<Part> parts = GetAllDataFromDB();
             ListToListView(parts);
         }
 
+        /// <summary>
+        /// Exit button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Buttonexit_Click(object sender, RoutedEventArgs e)
         {
             DbChangeConnectionState("Close");
             Environment.Exit(0);
         }
 
+        /// <summary>
+        /// Event called than text is changed in TextBoxFilterNumber
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBoxFilterNumber_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
-
+            if (TextBoxFilterNumber.Text != "")
+            {
+                ClearAllListViews();
+                ListToListView(GetDataFilteredByNumber(TextBoxFilterNumber.Text.ToString()));
+            }
+            else
+            {
+                List<Part> parts = GetAllDataFromDB();
+                ListToListView(parts);
+            }
         }
 
+        /// <summary>
+        /// Event called than text is changed in TextBoxFilterName
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TextBoxFilterName_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
-
+            if (TextBoxFilterName.Text != "")
+            {
+                ClearAllListViews();
+                ListToListView(GetDataFilteredByName(TextBoxFilterName.Text.ToString()));
+            }
+            else
+            {
+                List<Part> parts = GetAllDataFromDB();
+                ListToListView(parts);
+            }
         }
     }
 }
