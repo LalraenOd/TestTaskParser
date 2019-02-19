@@ -51,12 +51,12 @@ CREATE PROCEDURE [dbo].[sp_InsertPart]
 	@Specs nvarchar(1000)
 AS
 	INSERT INTO Parts(URL, BrandName, ArtNumber, PartName, Specs)
-	VALUES (@URL, @BrandName, @ArtNumber, @ArtNumber, @Specs)
+	VALUES (@URL, @BrandName, @ArtNumber, @PartName, @Specs)
 GO
 
 CREATE PROCEDURE [dbo].[sp_GetAllParts]
 AS
-	SELECT * FROM Parts
+	SELECT * FROM [TestCaseDb].[dbo].[Parts]
 GO
 
 CREATE PROCEDURE [dbo].[sp_GetPartsByNumber]

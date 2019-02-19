@@ -118,8 +118,20 @@ namespace TestTaskParserClient
         {
             foreach (Part part in parts)
             {
-                ListViewByNumber.Items.Add(part);
+                ListViewByNumber.Items.Add(new Part { PartArtNumber = part.PartArtNumber, PartBrand = part.PartBrand });
+                ListViewByName.Items.Add(new Part { PartName = part.PartName });
             }
+        }
+
+        private void ButtonRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            List<Part> parts = GetAllDataFromDB();
+            ListToListView(parts);
+        }
+
+        private void Buttonexit_Click(object sender, RoutedEventArgs e)
+        {
+            Environment.Exit(0);
         }
     }
 }
