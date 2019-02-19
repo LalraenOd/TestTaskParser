@@ -37,7 +37,7 @@ namespace TestTaskParser
                 Console.ResetColor();
             }
 
-            PartParser(manualParts);
+            PartParser(partsNumber);
             sqlConnection.Close();
             Console.Read();
         }
