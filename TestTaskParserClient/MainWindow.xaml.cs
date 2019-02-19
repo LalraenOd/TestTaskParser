@@ -252,5 +252,15 @@ namespace TestTaskParserClient
                 ListToListView(parts);
             }
         }
+
+        private void ListViewByNumber_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            ListViewByName.SelectedIndex = ListViewByNumber.SelectedIndex;
+        }
+
+        private void ListViewByName_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            ListViewByNumber.SelectedIndex = ListViewByName.SelectedIndex;
+        }
     }
 }

@@ -19,15 +19,15 @@
         <ListView x:Name="ListViewByNumber" Margin="10,80,10,9" ItemsSource="{Binding PartsList}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="PartArtNumber" DisplayMemberBinding="{Binding PartArtNumber}" />
-                    <GridViewColumn Header="BrandName" DisplayMemberBinding="{Binding PartBrand}" />
+                    <GridViewColumn Width="170" Header="PartArtNumber" DisplayMemberBinding="{Binding PartArtNumber}"/>
+                    <GridViewColumn Width ="170" Header="BrandName" DisplayMemberBinding="{Binding PartBrand}" />
                 </GridView>
             </ListView.View>
         </ListView>
         <ListView x:Name="ListViewByName" Margin="10,80,9,9" Grid.Column="1" Grid.ColumnSpan="2" ItemsSource="{Binding PartsList}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="PartName" DisplayMemberBinding="{Binding PartName}"/>
+                    <GridViewColumn Width="340" Header="PartName" DisplayMemberBinding="{Binding PartName}"/>
                 </GridView>
             </ListView.View>
         </ListView>
