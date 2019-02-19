@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace TestTaskParser
 {
@@ -112,21 +111,6 @@ namespace TestTaskParser
                     continue;
             }
             return partNeedsParse;
-        }
-
-        /// <summary>
-        /// Starts four different parser threads.
-        /// </summary>
-        /// <param name="PartsCodes"></param>
-        private static void ParserStart(string[] PartsCodes)
-        //Start parsing in 4 threads - TODO
-        {
-            Thread[] parsers = new Thread[4];
-            for (int i = 0; i < parsers.Length; i++)
-            {
-                parsers[i] = new Thread(() => PartParser(PartsCodes));
-                parsers[i].Start();
-            }
         }
 
         /// <summary>
@@ -248,7 +232,7 @@ namespace TestTaskParser
         /// </summary>
         /// <param name="part"></param>
         private static void PartToDbWriter(Part part)
-        //WRITING PART TO DB - TODO
+        //WRITING PART TO DB - DONE
         {
             try
             {
