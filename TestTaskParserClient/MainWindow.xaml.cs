@@ -27,13 +27,14 @@ namespace TestTaskParserClient
         }
 
         /// <summary>
-        /// Changes DB connection state
+        /// Changes connection state to param Open, Close
         /// </summary>
-        private static void DbChangeConnectionState()
+        /// <param name="connectionState"></param>
+        private static void DbChangeConnectionState(string connectionState)
         {
             string connectionString = @"Data Source=.\SQLEXPRESS;Initial Catalog=TestCaseDb;Integrated Security=True";
             sqlConnection = new SqlConnection(connectionString);
-            if (sqlConnection.State.ToString() == "Closed")
+            if (connectionState == "Open")
             {
                 try
                 {
@@ -49,11 +50,11 @@ namespace TestTaskParserClient
                     MessageBox.Show("SQL CONNECTED SUCCESSFULLY");
                 }
             }
-            else if (sqlConnection.State.ToString() == "Open")
+            else if (connectionState == "Close")
             {
                 try
                 {
-                    sqlConnection.Open();
+                    sqlConnection.Close();
                 }
                 catch (SqlException ex)
                 {
@@ -74,8 +75,8 @@ namespace TestTaskParserClient
         /// </summary>
         private List<Part> GetAllDataFromDB()
         {
-            DbChangeConnectionState();
             List<Part> partsList = new List<Part>();
+            DbChangeConnectionState("Open");
             string sqlExpression = "sp_GetAllParts";
             SqlCommand sqlCommand = new SqlCommand(sqlExpression, sqlConnection)
             {
@@ -95,7 +96,7 @@ namespace TestTaskParserClient
                 };
                 partsList.Add(part);
             }
-            DbChangeConnectionState();
+            DbChangeConnectionState("Close");
             return partsList;
         }
 
@@ -112,6 +113,70 @@ namespace TestTaskParserClient
             }
         }
 
+        /// <summary>
+        /// Gets all parts from DB filtered by number
+        /// </summary>
+        /// <returns></returns>
+        private List<Part> GetDataFilteredByNumber(string partNumber)
+        {
+            List<Part> partsList = new List<Part>();
+            DbChangeConnectionState("Open");
+            string sqlExpression = "sp_GetPartsByNumber";
+            SqlCommand sqlCommand = new SqlCommand(sqlExpression, sqlConnection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            sqlCommand.Parameters.Add(partNumber);
+            SqlDataReader sqlDataReader = sqlCommand.ExecuteReader();
+
+            while (sqlDataReader.Read())
+            {
+                Part part = new Part
+                {
+                    PartUrl = sqlDataReader["URL"].ToString(),
+                    PartBrand = sqlDataReader["BrandName"].ToString(),
+                    PartArtNumber = sqlDataReader["ArtNumber"].ToString(),
+                    PartName = sqlDataReader["PartName"].ToString(),
+                    PartSpecs = sqlDataReader["Specs"].ToString().Split('\n').ToList()
+                };
+                partsList.Add(part);
+            }
+            DbChangeConnectionState("Close");
+            return partsList;
+        }
+
+        /// <summary>
+        /// Gets all parts from DB filtered by name
+        /// </summary>
+        /// <returns></returns>
+        private List<Part> GetDataFilteredByName(string partName)
+        {
+            List<Part> partsList = new List<Part>();
+            DbChangeConnectionState("Open");
+            string sqlExpression = "sp_GetPartsByName";
+            SqlCommand sqlCommand = new SqlCommand(sqlExpression, sqlConnection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            sqlCommand.Parameters.Add(partName);
+            SqlDataReader sqlDataReader = sqlCommand.ExecuteReader();
+
+            while (sqlDataReader.Read())
+            {
+                Part part = new Part
+                {
+                    PartUrl = sqlDataReader["URL"].ToString(),
+                    PartBrand = sqlDataReader["BrandName"].ToString(),
+                    PartArtNumber = sqlDataReader["ArtNumber"].ToString(),
+                    PartName = sqlDataReader["PartName"].ToString(),
+                    PartSpecs = sqlDataReader["Specs"].ToString().Split('\n').ToList()
+                };
+                partsList.Add(part);
+            }
+            DbChangeConnectionState("Close");
+            return partsList;
+        }
+
         private void ButtonRefresh_Click(object sender, RoutedEventArgs e)
         {
             List<Part> parts = GetAllDataFromDB();
@@ -120,7 +185,18 @@ namespace TestTaskParserClient
 
         private void Buttonexit_Click(object sender, RoutedEventArgs e)
         {
+            DbChangeConnectionState("Close");
             Environment.Exit(0);
+        }
+
+        private void TextBoxFilterNumber_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+
+        }
+
+        private void TextBoxFilterName_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+
         }
     }
 }
