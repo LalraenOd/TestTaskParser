@@ -39,6 +39,7 @@ namespace TestTaskParser
 
             PartParser(partsNumber);
             sqlConnection.Close();
+            Console.WriteLine("DONE PARSING");
             Console.Read();
         }
 
@@ -213,7 +214,6 @@ namespace TestTaskParser
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("PARSING SUCCESSFUL");
                     Console.ResetColor();
-                    Console.WriteLine(parsedPart.ToString());
                     PartToDbWriter(parsedPart);
                 }
                 else

@@ -1,0 +1,40 @@
+﻿<Window x:Class="TestTaskParserClientMVVM.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TestTaskParserClientMVVM.ViewModel"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="500" Width="800">
+    
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300*"/>
+            <ColumnDefinition Width="300*"/>
+        </Grid.ColumnDefinitions>
+        <ListView x:Name="ListViewByNumber" Margin="10,80,10,9" ItemsSource="{Binding PartsList}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="PartArtNumber" DisplayMemberBinding="{Binding PartArtNumber}" />
+                    <GridViewColumn Header="BrandName" DisplayMemberBinding="{Binding PartBrand}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <ListView x:Name="ListViewByName" Margin="10,80,9,9" Grid.Column="1" Grid.ColumnSpan="2" ItemsSource="{Binding PartsList}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="PartName" DisplayMemberBinding="{Binding PartName}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <TextBox x:Name="TextBoxFilterNumber" Height="30" Margin="10,45,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" FontSize="16" TextAlignment="Center"/>
+        <TextBox x:Name="TextBoxFilterName" Grid.Column="1" Height="30" Margin="10,45,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" FontSize="16" TextAlignment="Center"/>
+        <Button x:Name="ButtonRefresh" Content="Refresh" Margin="10,10,10,0" Height="30" VerticalAlignment="Top"/>
+        <Button x:Name="Buttonexit" Content="Exit" Grid.Column="1" Margin="10,10,10,0" VerticalAlignment="Top" Height="30"/>
+
+    </Grid>
+</Window>

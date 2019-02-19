@@ -7,8 +7,8 @@ GO
 
 CREATE TABLE LinkParts(
 Id int IDENTITY PRIMARY KEY NOT NULL,
-PartNumber varchar(20),
-PartBrandName varchar(20)
+PartNumber varchar(100),
+PartBrandName varchar(100)
 );
 GO
 
@@ -19,12 +19,12 @@ GO
 CREATE TABLE Parts
 (
 Id int IDENTITY PRIMARY KEY NOT NULL,
-URL varchar(70) NOT NULL,
-BrandName nvarchar(20) NOT NULL,
-ArtNumber varchar(20) NOT NULL,
-PartName nvarchar(30) NOT NULL,
+URL varchar(100) NOT NULL,
+BrandName nvarchar(100) NOT NULL,
+ArtNumber varchar(100) NOT NULL,
+PartName nvarchar(100) NOT NULL,
 Specs nvarchar(1000) NOT NULL,
-LinkedParts int FOREIGN KEY REFERENCES LinkParts(Id)
+--LinkedParts int FOREIGN KEY REFERENCES LinkParts(Id)
 );
 GO
 
@@ -35,7 +35,6 @@ SELECT TOP (1000) [Id]
       ,[ArtNumber]
       ,[PartName]
       ,[Specs]
-      ,[LinkedParts]
   FROM [TestCaseDb].[dbo].[Parts]
   GO
 
@@ -44,10 +43,10 @@ DROP PROCEDURE [dbo].[sp_InsertPart]
 GO
 
 CREATE PROCEDURE [dbo].[sp_InsertPart]
-	@URL varchar(70),
-	@BrandName nvarchar(20),
-	@ArtNumber varchar(20),
-	@PartName nvarchar(30),
+	@URL varchar(100),
+	@BrandName nvarchar(100),
+	@ArtNumber varchar(100),
+	@PartName nvarchar(100),
 	@Specs nvarchar(1000)
 AS
 	INSERT INTO Parts(URL, BrandName, ArtNumber, PartName, Specs)
@@ -70,7 +69,7 @@ DROP PROCEDURE [dbo].[sp_GetPartsByNumber]
 GO
 
 CREATE PROCEDURE [dbo].[sp_GetPartsByNumber]
-	@ArtNumberToFind varchar(20)
+	@ArtNumberToFind varchar(100)
 AS
 	SELECT * FROM [TestCaseDb].[dbo].[Parts]
 	WHERE ArtNumber LIKE @ArtNumberToFind
@@ -82,7 +81,7 @@ DROP PROCEDURE [dbo].[sp_GetPartsByName]
 GO
 
 CREATE PROCEDURE [dbo].[sp_GetPartsByName]
-	@PartNameToFind varchar(30)
+	@PartNameToFind varchar(100)
 AS
 	SELECT * FROM [TestCaseDb].[dbo].[Parts]
 	WHERE PartName LIKE @PartNameToFind
