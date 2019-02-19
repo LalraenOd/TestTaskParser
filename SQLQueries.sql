@@ -23,7 +23,6 @@ URL varchar(70) NOT NULL,
 BrandName nvarchar(20) NOT NULL,
 ArtNumber varchar(20) NOT NULL,
 PartName nvarchar(30) NOT NULL,
---Specs xml,
 Specs nvarchar(1000) NOT NULL,
 LinkedParts int FOREIGN KEY REFERENCES LinkParts(Id)
 );

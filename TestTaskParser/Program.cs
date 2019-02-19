@@ -37,7 +37,7 @@ namespace TestTaskParser
                 Console.ResetColor();
             }
 
-            PartParser(partsNumber);
+            PartParser(manualParts);
             sqlConnection.Close();
             Console.Read();
         }
@@ -125,9 +125,8 @@ namespace TestTaskParser
             {
                 { "patternBrand", "<td class=ProdBra>(?<result>.+)</td>" }
                 ,{ "patternArt", "<td class=ProdArt>(?<result>.+)"}
-                ,{ "patternName", "<td></td><td class=ProdName>(?<result>.+)</td>"}
+                ,{ "patternName", "<td class=ProdName>(?<result>.+)</td>"}
                 ,{ "patternCriteria", "<span class=criteria>(?<result>.+)</span><br>"}
-                //,{ "patternCriteriaNEW", "<div class=partsDescript>(?<result>.+)<div id=TabsContent></div>" }
             };
             bool parseSuccess = true;
 
