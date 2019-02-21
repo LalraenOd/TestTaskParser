@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,39 +10,13 @@ using TestTaskParser;
 
 namespace TestTaskParserClientMVVM.ViewModel
 {
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel 
     {
-        private List<Part> partsPartsList;
-
-        public List<Part> PartsList
+        public MainWindowViewModel()
         {
-            get { return partsPartsList = Model.Model.GetAllDataFromDB(); }
-            set { partsPartsList = value; OnPropertyChanged("PartsList"); }
+            PartsList = Model.Model.GetAllDataFromDB();
         }
 
-        private string filterByNumber;
-
-        public string FilterByNumber
-        {
-            get { return filterByNumber; }
-            set { filterByNumber = value; OnPropertyChanged("FilterByNumber"); }
-        }
-
-        private string filterByName;
-
-        public string FilterByName
-        {
-            get { return filterByName; }
-            set { filterByName = value; OnPropertyChanged("FilterByName"); }
-        }        
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged([CallerMemberName]string prop = "")
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(prop));
-            }
-        }
+        public List<Part> PartsList { get; set; }
     }
 }
