@@ -84,5 +84,5 @@ CREATE PROCEDURE [dbo].[sp_GetPartsByName]
 	@PartNameToFind varchar(100)
 AS
 	SELECT * FROM [TestCaseDb].[dbo].[Parts]
-	WHERE PartName LIKE @PartNameToFind
+	WHERE PartName LIKE '%' + @PartNameToFind + '%'
 GO

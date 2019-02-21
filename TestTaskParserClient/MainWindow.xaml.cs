@@ -199,6 +199,8 @@ namespace TestTaskParserClient
         /// <param name="e"></param>
         private void ButtonRefresh_Click(object sender, RoutedEventArgs e)
         {
+            TextBoxFilterName.Clear();
+            TextBoxFilterNumber.Clear();
             ClearAllListViews();
             List<Part> parts = GetAllDataFromDB();
             ListToListView(parts);
